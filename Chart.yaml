@@ -1,0 +1,42 @@
+apiVersion: v2
+name: integration-manager-umbrella
+version: 1.0.0
+appVersion: 2.0.5
+description: Installs Integration Manager, DataCloud Worker, NGINX Ingress, RabbitMQ, MySQL
+type: application
+keywords:
+  - Integration Manager
+  - DataCloud Worker
+  - NGINX Ingress
+  - RabbitMQ
+  - MySQL
+
+dependencies:
+  - name: integration-manager
+    repository: https://s3.amazonaws.com/actian-datacloud-helm-charts
+    version: 1.2.17
+    condition: integration-manager.enabled
+  - name: integration-manager-worker
+    repository: https://s3.amazonaws.com/actian-datacloud-helm-charts
+    version: 1.2.4
+    condition: integration-manager-worker.enabled
+  - name: amqp-pod-autoscaler
+    repository: https://s3.amazonaws.com/actian-datacloud-helm-charts
+    version: 1.2.4
+    condition: amqp-pod-autoscaler.enabled
+  - name: nginx-ingress
+    version: 1.14.0
+    repository: https://kubernetes-charts.storage.googleapis.com
+    condition: nginx-ingress.enabled
+  - name: rabbitmq-ha
+    version: 1.28.0
+    repository: https://kubernetes-charts.storage.googleapis.com
+    condition: rabbitmq-ha.enabled
+  - name: mysql
+    version: 1.5.0
+    repository: https://kubernetes-charts.storage.googleapis.com
+    condition: mysql.enabled
+  - name: minio
+    version: 3.0.2
+    repository: https://kubernetes-charts.storage.googleapis.com
+    condition: minio.enabled

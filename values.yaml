@@ -1,0 +1,164 @@
+# ---- Integration Manager ----
+# https://github.com/ActianCorp/integration-manager-helm-chart
+integration-manager:
+  enabled: true
+  imagePullSecrets:
+    - actian-registrykey
+  prometheus:
+    operator:
+      enabled: false
+  ingress:
+    enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      kubernetes.io/ingress.class: nginx
+    # Not specifying hostName to allow rules to apply to all incoming traffic through NGINX
+    hostName:
+  # This must be the IP & port where NGINX will be available
+  imBaseUrl: http://<ip>:<port>
+  destinationId: 1
+  datasource:
+    url: jdbc:mysql://integration-manager-mysql:3306/db?useSSL=false&createDatabaseIfNotExist=true&allowMultiQueries=true
+    username: user
+    password: password
+  amqp:
+    host: integration-manager-rabbitmq-ha
+  existingRabbitSecret: integration-manager-rabbitmq-ha
+  # File storage settings for in-cluster minio
+  repository:
+    storageType: aws
+    sourceBucket: repository
+    sourcePrefix: datacloud
+    targetBucket: execution
+    targetPrefix: ""
+    jobTemplateDir: /product
+    jobConfigDir: /provisioning
+    awsServiceEndpoint: http://integration-manager-minio:9000
+    awsSigningRegion: us-east-1
+    awsCreateEnvVar: true
+    # Fake keys used for minio
+    awsAccessKeyId: AKIAIOSFODNN7EXAMPLE
+    awsSecretAccessKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  extraConfig: |
+    # path-style-access is required for minio ingress to route properly when running in k8s
+    repository.aws.path-style-access-enabled=true
+    logging.level.com.actian.datacloud=INFO
+
+# ---- Integration Manager Worker ----
+# https://github.com/ActianCorp/integration-manager-worker-helm-chart
+integration-manager-worker:
+  enabled: true
+  imagePullSecrets:
+    - actian-registrykey
+  image: actian/datacloud-worker:2.0.6.294
+  pullPolicy: IfNotPresent
+  replicaCount: 1
+  resources: {}
+  destinationId: 1
+  existingRabbitSecret: integration-manager-rabbitmq-ha
+  amqp:
+    host: integration-manager-rabbitmq-ha.default.svc.cluster.local
+  license:
+  # Example:
+  # license: |
+  #   <my-license-contents>
+
+# ---- AMQP Pod Autoscaler ----
+# https://github.com/ActianCorp/amqp-pod-autoscaler-helm-chart
+amqp-pod-autoscaler:
+  # TODO: come back to this
+  enabled: false
+  imagePullSecrets:
+    - actian-registrykey
+  image: actian/k8s-rabbit-pod-autoscaler:2.0.6.294
+  pullPolicy: IfNotPresent
+  resources: {}
+  existingRabbitSecret: integration-manager-rabbitmq-ha
+  amqp.managementUrl: http://integration-manager-rabbitmq-ha.default.svc.cluster.local:15672
+  actian:
+    im:
+      url: http://integration-manager-base.default.svc.cluster.local:8080
+      # TODO: Don't think we bootstrap this
+      clientId:
+      clientSecret:
+      deviceCode:
+      userCode:
+
+
+# ---- Liquibase ----
+# This runs a docker image that contains liquibase scripts to bootstrap the database
+liquibase:
+  enabled: true
+  imagePullSecrets:
+    - actian-registrykey
+  image: actian/integration-manager-liquibase:2.0.6.294
+  pullPolicy: IfNotPresent
+
+# ---- NGINX-Ingress ----
+# https://github.com/helm/charts/tree/master/stable/nginx-ingress
+nginx-ingress:
+  enabled: true
+  controller:
+    kind: Deployment
+    replicaCount: 1
+    resources: {}
+    config:
+      ssl-redirect: "false"
+    service:
+      type: ClusterIP
+      omitClusterIP: true
+
+  defaultBackend:
+    replicaCount: 1
+    resources: {}
+    service:
+      omitClusterIP: true
+
+# ---- RabbitMQ ----
+# https://github.com/helm/charts/tree/master/stable/rabbitmq-ha
+rabbitmq-ha:
+  enabled: true
+  replicaCount: 1
+  rabbitmqUsername: guest
+  rabbitmqPassword: password
+  persistentVolume:
+    # Explicitly disabled for demo purposes & ease of configurability
+    enabled: false
+  resources: {}
+
+# ---- MySQL ----
+# https://github.com/helm/charts/tree/master/stable/mysql
+mysql:
+  enabled: true
+  mysqlUser: user
+  mysqlPassword: password
+  mysqlDatabase: db
+  # MySQL Crashes if a pod with a name that's too long connects: # https://www.digitalocean.com/community/questions/mysql-crashes-when-my-pods-connects
+  configurationFiles:
+    mysql.cnf: |-
+      [mysqld]
+      skip-host-cache
+      skip-name-resolve
+  persistence:
+    # Explicitly disabled for demo purposes & ease of configurability
+    enabled: false
+  resources: {}
+
+# ---- MinIO ----
+# https://github.com/helm/charts/tree/master/stable/minio
+minio:
+  mode: standalone
+  # Fake keys for minio
+  accessKey: AKIAIOSFODNN7EXAMPLE
+  secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  persistence:
+    # Explicitly disabled for demo purposes & ease of configurability
+    enabled: false
+  buckets:
+   - name: repository
+     policy: none
+     purge: false
+   - name: execution
+     policy: none
+     purge: false
+  resources: {}

@@ -1,0 +1,34 @@
+{{- if .Values.liquibase.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: liquibase
+spec:
+  completions: 1
+  template:
+    metadata:
+      name: liquibase
+    spec:
+      {{- if .Values.liquibase.imagePullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.liquibase.imagePullSecrets }}
+      - name: {{ . }}
+      {{- end }}
+      {{- end }}
+      containers:
+        - name: liquibase
+          image: {{ .Values.liquibase.image }}
+          imagePullPolicy: {{ .Values.liquibase.pullPolicy }}
+          env:
+            - name: spring.datasource.platform
+              value: "mysql"
+            - name: spring.datasource.driver-class-name
+              value: "com.mysql.jdbc.Driver"
+            - name: spring.datasource.url
+              value: {{ printf "jdbc:mysql://integration-manager-mysql:3306/%s?useSSL=false&createDatabaseIfNotExist=true&allowMultiQueries=true" .Values.mysql.mysqlDatabase }}
+            - name: spring.datasource.username
+              value: {{ .Values.mysql.mysqlUser | quote }}
+            - name: spring.datasource.password
+              value: {{ .Values.mysql.mysqlPassword | quote }}
+      restartPolicy: Never
+{{- end }}
