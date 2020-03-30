@@ -63,28 +63,6 @@ integration-manager-worker:
   # license: |
   #   <my-license-contents>
 
-# ---- AMQP Pod Autoscaler ----
-# https://github.com/ActianCorp/amqp-pod-autoscaler-helm-chart
-amqp-pod-autoscaler:
-  # TODO: come back to this
-  enabled: false
-  imagePullSecrets:
-    - actian-registrykey
-  image: actian/k8s-rabbit-pod-autoscaler:2.0.6.294
-  pullPolicy: IfNotPresent
-  resources: {}
-  existingRabbitSecret: integration-manager-rabbitmq-ha
-  amqp.managementUrl: http://integration-manager-rabbitmq-ha.default.svc.cluster.local:15672
-  actian:
-    im:
-      url: http://integration-manager-base.default.svc.cluster.local:8080
-      # TODO: Don't think we bootstrap this
-      clientId:
-      clientSecret:
-      deviceCode:
-      userCode:
-
-
 # ---- Liquibase ----
 # This runs a docker image that contains liquibase scripts to bootstrap the database
 liquibase:

@@ -20,10 +20,6 @@ dependencies:
     repository: https://s3.amazonaws.com/actian-datacloud-helm-charts
     version: 1.2.4
     condition: integration-manager-worker.enabled
-  - name: amqp-pod-autoscaler
-    repository: https://s3.amazonaws.com/actian-datacloud-helm-charts
-    version: 1.2.4
-    condition: amqp-pod-autoscaler.enabled
   - name: nginx-ingress
     version: 1.14.0
     repository: https://kubernetes-charts.storage.googleapis.com
