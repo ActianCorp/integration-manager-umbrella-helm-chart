@@ -1,5 +1,5 @@
 # Integration Manager Umbrella Chart  
-This chart is not intended for production use. This serves as an overview for how Integration Manager can be configured to run on Kubernetes.
+This chart is not intended for production use. This serves as an example for how Integration Manager can be configured to run on Kubernetes.
 
 ## Overview
 This chart installs the following components with no cloud dependencies required
