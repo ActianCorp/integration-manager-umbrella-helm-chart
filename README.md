@@ -46,7 +46,7 @@ All of the default values are set up under the assumption that the release name 
 ```helm install integration-manager . -f override-values.yaml``` 
 
 ## Exposing the APIs outside of the cluster with NGINX  
-```kubectl port-forward svc/integration-manager-nginx-ingress-controller 8080:80```  
+```kubectl port-forward svc/integration-manager-nginx-ingress-controller 8080:80 --address 0.0.0.0```  
 
 Integration Manager Console will be available at:
 - localhost:8080/ui
