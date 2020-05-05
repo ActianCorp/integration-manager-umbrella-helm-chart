@@ -27,7 +27,7 @@ https://helm.sh/docs/topics/charts/
 ### Add helm repositories  
 Run the following commands to add helm repositories  
 - ```helm repo add stable https://kubernetes-charts.storage.googleapis.com```
-- ```helm repo add actian-datacloud https://s3.amazonaws.com/actian-datacloud-helm-charts-us-east-1```
+- ```helm repo add actian-datacloud https://s3.amazonaws.com/actian-datacloud-helm-charts```
 
 ### Pull helm dependencies  
 From project root run ```helm dependency update```  
