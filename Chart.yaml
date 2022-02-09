@@ -14,25 +14,25 @@ keywords:
 dependencies:
   - name: integration-manager
     repository: https://s3.amazonaws.com/actian-datacloud-helm-charts
-    version: 1.2.17
+    version: 1.2.58
     condition: integration-manager.enabled
   - name: integration-manager-worker
     repository: https://s3.amazonaws.com/actian-datacloud-helm-charts
-    version: 1.2.4
+    version: 1.2.30
     condition: integration-manager-worker.enabled
-  - name: nginx-ingress
-    version: 1.14.0
-    repository: https://kubernetes-charts.storage.googleapis.com
-    condition: nginx-ingress.enabled
-  - name: rabbitmq-ha
-    version: 1.28.0
-    repository: https://kubernetes-charts.storage.googleapis.com
-    condition: rabbitmq-ha.enabled
+  - name: ingress-nginx
+    version: 3.35.0
+    repository: https://kubernetes.github.io/ingress-nginx
+    condition: ingress-nginx.enabled
+  - name: rabbitmq
+    version: 8.28.1
+    repository: https://charts.bitnami.com/bitnami
+    condition: rabbitmq.enabled
   - name: mysql
-    version: 1.5.0
-    repository: https://kubernetes-charts.storage.googleapis.com
+    version: 8.8.23
+    repository: https://charts.bitnami.com/bitnami
     condition: mysql.enabled
   - name: minio
-    version: 3.0.2
-    repository: https://kubernetes-charts.storage.googleapis.com
+    version: 10.1.6
+    repository: https://charts.bitnami.com/bitnami
     condition: minio.enabled

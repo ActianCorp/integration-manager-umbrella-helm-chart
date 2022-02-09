@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: liquibase
+  name: {{.Release.Name}}-liquibase
 spec:
   completions: 1
   template:
@@ -25,10 +25,10 @@ spec:
             - name: spring.datasource.driver-class-name
               value: "com.mysql.jdbc.Driver"
             - name: spring.datasource.url
-              value: {{ printf "jdbc:mysql://integration-manager-mysql:3306/%s?useSSL=false&createDatabaseIfNotExist=true&allowMultiQueries=true" .Values.mysql.mysqlDatabase }}
+              value: {{ printf "jdbc:mysql://integration-manager-mysql:3306/%s?useSSL=false&createDatabaseIfNotExist=true&allowMultiQueries=true" .Values.mysql.auth.database }}
             - name: spring.datasource.username
-              value: {{ .Values.mysql.mysqlUser | quote }}
+              value: {{ .Values.mysql.auth.username | quote }}
             - name: spring.datasource.password
-              value: {{ .Values.mysql.mysqlPassword | quote }}
+              value: {{ .Values.mysql.auth.password | quote }}
       restartPolicy: Never
 {{- end }}

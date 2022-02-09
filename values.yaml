@@ -22,8 +22,9 @@ integration-manager:
     username: user
     password: password
   amqp:
-    host: integration-manager-rabbitmq-ha
-  existingRabbitSecret: integration-manager-rabbitmq-ha
+    host: integration-manager-rabbitmq
+    username: guest
+    password: password
   # File storage settings for in-cluster minio
   repository:
     storageType: aws
@@ -43,21 +44,41 @@ integration-manager:
     # path-style-access is required for minio ingress to route properly when running in k8s
     repository.aws.path-style-access-enabled=true
     logging.level.com.actian.datacloud=INFO
-
+  aggregator:
+    image: actian/aggregator-service:3.0.0
+  aggregatorProcessor:
+    image: actian/aggregator-processor:3.0.0
+  integrationManagerBase:
+    image: actian/integration-manager-base:3.0.0
+  jobExecution:
+    image: actian/job-execution-service:3.0.0
+  jobResultsProcessor:
+    image: actian/job-results-processor:3.0.0
+  jobScheduler:
+    image: actian/job-scheduler-service:3.0.0
+  staticContent:
+    image: actian/integration-manager-static-content:3.0.0
+    aopAppConfig: |
+      something
 # ---- Integration Manager Worker ----
 # https://github.com/ActianCorp/integration-manager-worker-helm-chart
 integration-manager-worker:
   enabled: true
   imagePullSecrets:
     - actian-registrykey
-  image: actian/datacloud-worker:2.0.6.294
+  image: actian/datacloud-worker:2.1.6
+  dcEngineImage: actian/dataconnect-engine:11.6.0-108
   pullPolicy: IfNotPresent
   replicaCount: 1
   resources: {}
   destinationId: 1
-  existingRabbitSecret: integration-manager-rabbitmq-ha
   amqp:
-    host: integration-manager-rabbitmq-ha.default.svc.cluster.local
+    host: integration-manager-rabbitmq
+    username: guest
+    password: password
+  extraConfig: |
+    logging.level.org.springframework.amqp.rabbit.core=DEBUG
+    logging.level.com.actian.datacloud=DEBUG
   license:
   # Example:
   # license: |
@@ -69,74 +90,70 @@ liquibase:
   enabled: true
   imagePullSecrets:
     - actian-registrykey
-  image: actian/integration-manager-liquibase:2.0.6.294
+  image: actian/integration-manager-liquibase:develop
   pullPolicy: IfNotPresent
 
 # ---- NGINX-Ingress ----
-# https://github.com/helm/charts/tree/master/stable/nginx-ingress
-nginx-ingress:
+# https://github.com/bitnami/charts/tree/master/bitnami/nginx
+ingress-nginx:
   enabled: true
+  kind: Deployment
+  replicas: 1
   controller:
-    kind: Deployment
-    replicaCount: 1
-    resources: {}
-    config:
-      ssl-redirect: "false"
     service:
       type: ClusterIP
       omitClusterIP: true
 
-  defaultBackend:
-    replicaCount: 1
-    resources: {}
-    service:
-      omitClusterIP: true
-
 # ---- RabbitMQ ----
-# https://github.com/helm/charts/tree/master/stable/rabbitmq-ha
-rabbitmq-ha:
+# https://github.com/bitnami/charts/tree/master/bitnami/rabbitmq
+rabbitmq:
   enabled: true
+  forceBoot: true
+  prometheus:
+    operator:
+      enabled: false
   replicaCount: 1
-  rabbitmqUsername: guest
-  rabbitmqPassword: password
-  persistentVolume:
+  auth:
+    erlangCookie: A90LtNydMy8Ff2nqi6kPhtj13pAUxo0h
+    username: guest
+    password: password
+  persistence:
     # Explicitly disabled for demo purposes & ease of configurability
-    enabled: false
+    enabled: true
   resources: {}
 
 # ---- MySQL ----
-# https://github.com/helm/charts/tree/master/stable/mysql
+# https://github.com/bitnami/charts/tree/master/bitnami/mysql
 mysql:
   enabled: true
-  mysqlUser: user
-  mysqlPassword: password
-  mysqlDatabase: db
-  # MySQL Crashes if a pod with a name that's too long connects: # https://www.digitalocean.com/community/questions/mysql-crashes-when-my-pods-connects
-  configurationFiles:
-    mysql.cnf: |-
-      [mysqld]
-      skip-host-cache
-      skip-name-resolve
-  persistence:
-    # Explicitly disabled for demo purposes & ease of configurability
-    enabled: false
-  resources: {}
+  auth:
+    username: user
+    password: password
+    database: db
+    rootPassword: password
+#  # MySQL Crashes if a pod with a name that's too long connects: # https://www.digitalocean.com/community/questions/mysql-crashes-when-my-pods-connects
+#  configurationFiles:
+#    mysql.cnf: |-
+#      [mysqld]
+#      skip-host-cache
+#      skip-name-resolve
+  primary:
+    persistence:
+      # Explicitly disabled for demo purposes & ease of configurability
+      enabled: true
+  secondary:
+    replicaCount: 0
 
 # ---- MinIO ----
-# https://github.com/helm/charts/tree/master/stable/minio
+# https://github.com/bitnami/charts/tree/master/bitnami/minio
 minio:
+  enabled: true
   mode: standalone
-  # Fake keys for minio
-  accessKey: AKIAIOSFODNN7EXAMPLE
-  secretKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  auth:
+    rootUser: AKIAIOSFODNN7EXAMPLE
+    rootPassword: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   persistence:
     # Explicitly disabled for demo purposes & ease of configurability
-    enabled: false
-  buckets:
-   - name: repository
-     policy: none
-     purge: false
-   - name: execution
-     policy: none
-     purge: false
+    enabled: true
+  defaultBuckets: "repository,execution"
   resources: {}
