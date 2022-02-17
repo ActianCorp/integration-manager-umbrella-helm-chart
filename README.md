@@ -20,13 +20,14 @@ https://helm.sh/docs/topics/charts/
 
 ## Prerequisites:  
 - helm3
-- Kubernetes Cluster (Tested on Docker-Desktop K8s v1.15.5 - Does not work with v1.16+ due to deprecated APIs)
+- Last tested against K8s version
+    - Client Version: version.Info{Major:"1", Minor:"21", GitVersion:"v1.21.2", GitCommit:"092fbfbf53427de67cac1e9fa54aaa09a28371d7", GitTreeState:"clean", BuildDate:"2021-06-16T12:52:14Z", GoVersion:"go1.16.5", Compiler:"gc", Platform:"darwin/amd64"}
+    - Server Version: version.Info{Major:"1", Minor:"21", GitVersion:"v1.21.1", GitCommit:"5e58841cce77d4bc13713ad2b91fa0d961e69192", GitTreeState:"clean", BuildDate:"2021-05-21T23:01:33Z", GoVersion:"go1.16.4", Compiler:"gc", Platform:"linux/amd64"}
 
 ## Installation  
 
 ### Add helm repositories  
 Run the following commands to add helm repositories  
-- ```helm repo add stable https://kubernetes-charts.storage.googleapis.com```
 - ```helm repo add actian-datacloud https://s3.amazonaws.com/actian-datacloud-helm-charts```
 
 ### Pull helm dependencies  
@@ -49,7 +50,7 @@ All of the default values are set up under the assumption that the release name 
 ```kubectl port-forward svc/integration-manager-ingress-nginx-controller 8080:80 --address 0.0.0.0```  
 
 Integration Manager Console will be available at:
-- localhost:8080/ui
+- localhost:8080/dx
 
 Integration Manager API Documentation will be available at:
 - localhost:8080/apidocs

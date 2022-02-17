@@ -43,21 +43,28 @@ integration-manager:
   extraConfig: |
     # path-style-access is required for minio ingress to route properly when running in k8s
     repository.aws.path-style-access-enabled=true
-    logging.level.com.actian.datacloud=INFO
+    logging.level.com.actian.datacloud=DEBUG
   aggregator:
-    image: actian/aggregator-service:3.0.0
+    image: actian/aggregator-service:3.0.1-rc
+    pullPolicy: Always
   aggregatorProcessor:
-    image: actian/aggregator-processor:3.0.0
+    image: actian/aggregator-processor:3.0.1-rc
+    pullPolicy: Always
   integrationManagerBase:
-    image: actian/integration-manager-base:3.0.0
+    image: actian/integration-manager-base:3.0.1-rc
+    pullPolicy: Always
   jobExecution:
-    image: actian/job-execution-service:3.0.0
+    image: actian/job-execution-service:3.0.1-rc
+    pullPolicy: Always
   jobResultsProcessor:
-    image: actian/job-results-processor:3.0.0
+    image: actian/job-results-processor:3.0.1-rc
+    pullPolicy: Always
   jobScheduler:
-    image: actian/job-scheduler-service:3.0.0
+    image: actian/job-scheduler-service:3.0.1-rc
+    pullPolicy: Always
   staticContent:
-    image: actian/integration-manager-static-content:3.0.0
+    image: actian/integration-manager-static-content:3.0.1-rc
+    pullPolicy: Always
     aopAppConfig: |
       something
 # ---- Integration Manager Worker ----
@@ -66,9 +73,9 @@ integration-manager-worker:
   enabled: true
   imagePullSecrets:
     - actian-registrykey
-  image: actian/datacloud-worker:2.1.6
-  dcEngineImage: actian/dataconnect-engine:11.6.0-108
-  pullPolicy: IfNotPresent
+  image: actian/datacloud-worker:3.0.1-rc
+  dcEngineImage: actian/dataconnect-engine:12.0.0-27
+  pullPolicy: Always
   replicaCount: 1
   resources: {}
   destinationId: 1
@@ -90,7 +97,7 @@ liquibase:
   enabled: true
   imagePullSecrets:
     - actian-registrykey
-  image: actian/integration-manager-liquibase:develop
+  image: actian/integration-manager-liquibase:3.0.1-rc
   pullPolicy: IfNotPresent
 
 # ---- NGINX-Ingress ----
