@@ -14,7 +14,7 @@ keywords:
 dependencies:
   - name: integration-manager
     repository: https://s3.amazonaws.com/actian-datacloud-helm-charts
-    version: 1.2.58
+    version: 1.2.60
     condition: integration-manager.enabled
   - name: integration-manager-worker
     repository: https://s3.amazonaws.com/actian-datacloud-helm-charts
