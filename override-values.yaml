@@ -1,3 +1,6 @@
+# This is a very basic example.
+# How these values are defined will override the default templates from the Integration Manager helm chart
+# https://github.com/ActianCorp/integration-manager-helm-chart/tree/master/templates
 integration-manager:
   # The IP & port where NGINX will be available after running kubectl port-forward svc/integration-manager-nginx-ingress-controller 8080:80 --address 0.0.0.0
   imBaseUrl: http://<ip-where-port-forward-was-ran>:8080

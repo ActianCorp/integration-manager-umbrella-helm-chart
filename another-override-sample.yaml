@@ -1,0 +1,204 @@
+mysql:
+  # Specifying the platform may not be necessary, but it's a good practice
+  platform: linux/x86_64
+  enabled: true
+  auth:
+    username: user
+    password: password
+    database: db
+    rootPassword: password
+  primary:
+    persistence:
+      # Explicitly disabled for demo purposes & ease of configurability
+      enabled: true
+    startupProbe:
+      enabled: true
+      initialDelaySeconds: 30
+      periodSeconds: 300
+      timeoutSeconds: 1
+      failureThreshold: 600
+      successThreshold: 1
+  secondary:
+    replicaCount: 0
+
+ingress-nginx:
+  controller:
+    livenessProbe:
+      httpGet:
+        # should match container.healthCheckPath
+        path: "/healthz"
+        port: 10254
+        scheme: HTTP
+      initialDelaySeconds: 60
+      periodSeconds: 60
+      timeoutSeconds: 1
+      successThreshold: 1
+      failureThreshold: 25
+    readinessProbe:
+      httpGet:
+        # should match container.healthCheckPath
+        path: "/healthz"
+        port: 10254
+        scheme: HTTP
+      initialDelaySeconds: 60
+      periodSeconds: 60
+      timeoutSeconds: 1
+      successThreshold: 1
+      failureThreshold: 25
+
+rabbitmq:
+  image:
+    registry: ghcr.io
+    repository: zcube/bitnami-compat/rabbitmq
+    tag: 3.9.13-debian-10
+  enabled: true
+  forceBoot: true
+  prometheus:
+    operator:
+      enabled: false
+  replicaCount: 1
+  auth:
+    erlangCookie:
+    username: some_user (configured when you install rabbitmq)
+    password: some_password (configured when you install rabbitmq)
+    # Alternatively, you could use an existing secret for credentials. Rabbit also supports TLS for secure connections.
+    # For that you will need to check the rabbitmq chart documentation.
+  persistence:
+    enabled: true
+  resources: {}
+
+integration-manager:
+  # The IP & port where NGINX will be available after running kubectl port-forward svc/integration-manager-nginx-ingress-controller 8080:80 --address 0.0.0.0
+  imBaseUrl: http://your-machine.local.com:8080
+
+  staticContent:
+    # These are the endpoints used by your browser from the IM Console, configure with the same value as imBaseUrl
+    baseEndpoint: http://your-machine.local.com:8080
+    jobsEndpoint: http://your-machine.local.com:8080
+
+  # Configure with your dataconnect license
+  # Example:
+  # license: |
+  #   <my-license-contents>
+  license: >-
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <!-- Do not modify this file. It is digitally signed. -->
+    <!--License Signer Version: v11-->
+    <License>
+    <Owner>Actian Corporation</Owner>
+    <Organization>Actian DataCloud</Organization>
+    <ProductName>DataConnect 11 Ent - 20 Eng, Prod (Sub)</ProductName>
+  # etc... this has been snipped
+
+integration-manager-worker:  # Engine license goes here
+  dc12license: >-
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <!-- Do not modify this file.  It is digitally signed. -->
+    <License>
+      <Owner>Actian User</Owner>
+      <Organization>Actian Corp.</Organization>
+  # etc... this has been snipped
+
+destination-management-service:
+  image: actian/destination-management-service:develop
+  imagePullSecrets:
+    - actian-registrykey
+  imagePullPolicy: Always
+  replicaCount: 1
+  podAnnotations: { }
+  revisionHistoryLimit: 1
+  extraLabels: { }
+  affinity: { }
+  nodeSelector: { }
+  extraInitContainers: { }
+  livenessProbe:
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    httpGet:
+      scheme: HTTP
+      path: /health
+      port: 8080
+  readinessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+    httpGet:
+      scheme: HTTP
+      path: /health
+      port: 8080
+
+  pdb: { }
+
+  resources:
+    requests:
+      memory: 900Mi
+      cpu: 400m
+    limits:
+      memory: 900Mi
+
+  existingIMSecret: integration-manager
+  existingRabbitSecret: rabbitmq
+
+  service:
+    annotations: { }
+
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/rewrite-target: "/$1"
+      nginx.ingress.kubernetes.io/x-forwarded-prefix: "/v2"
+    pathVersionPrefix: v2
+
+  # application.yml properties for configmap
+  config:
+    worker:
+      embedded: false
+    spring:
+      datasource:
+        platform: mysql
+        driverClassName: com.mysql.jdbc.Driver
+        initialization-mode: never
+        continue-on-error: false
+    encryption:
+      enabled: true
+      password-encoder-type: datacloud
+      client-secret-encoder-type: datacloud
+      certificate-name: cloudsecretkey
+      key-store: /etc/secrets/dbsecurity.keystore
+    queue:
+      ssl:
+        enabled: true
+        key-store-password: password
+        key-store: rabbitmq-security/keycert.p12
+        protocol: TLSv1.2
+        key-store-type: PKCS12
+
+  serviceAccount:
+    annotations: { }
+
+  # Below here is where your DataConnect and DataFlow licenses go
+  license:
+    dc11license: >-
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <!-- Do not modify this file. It is digitally signed. -->
+      <!--License Signer Version: v11-->
+      <License>
+      <Owner>Actian Corporation</Owner>
+      <Organization>Actian DataCloud</Organization>
+    # etc... this has been snipped
+    dflicense: >-
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <!-- Do not modify this file.  It is digitally signed. -->
+      <!--License Signer Version: v10-->
+      <License>
+        <Owner>Actian</Owner>
+        <Organization>Actian DataFlow Internal</Organization>
+        <ProductName>Actian DataFlow for KNIME, Capacity Based</ProductName>
+    # etc... this has been snipped

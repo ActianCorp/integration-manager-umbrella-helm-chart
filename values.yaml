@@ -2,14 +2,18 @@
 # https://github.com/ActianCorp/integration-manager-helm-chart
 integration-manager:
   enabled: true
+  # Credentials can be managed via
+  # https://kubernetes.io/docs/concepts/configuration/secret/
   imagePullSecrets:
-    - actian-registrykey
+    - your-secret-here
   prometheus:
     operator:
       enabled: false
   ingress:
     enabled: true
     annotations:
+      # Will filter different API requests to the appropriate pods. If you only have
+      # a single integration manager pod running, this should be disabled
       nginx.ingress.kubernetes.io/use-regex: "true"
       kubernetes.io/ingress.class: nginx
     # Not specifying hostName to allow rules to apply to all incoming traffic through NGINX
@@ -18,12 +22,12 @@ integration-manager:
   imBaseUrl: http://<ip>:<port>
   destinationId: 1
   datasource:
-    url: jdbc:mysql://integration-manager-mysql:3306/db?useSSL=false&createDatabaseIfNotExist=true&allowMultiQueries=true
+    url: jdbc:mysql://etc/etc
     username: user
     password: password
   amqp:
     host: integration-manager-rabbitmq
-    username: guest
+    username: user
     password: password
   # File storage settings for in-cluster minio
   repository:
@@ -44,17 +48,18 @@ integration-manager:
     # path-style-access is required for minio ingress to route properly when running in k8s
     repository.aws.path-style-access-enabled=true
     logging.level.com.actian.datacloud=DEBUG
+  # These images get updated from time to time for enhancements and to fix "features".
   aggregator:
-    image: actian/aggregator-service:3.0.1-rc
+    image: actian/aggregator-service:3.1.3
     pullPolicy: Always
   aggregatorProcessor:
-    image: actian/aggregator-processor:3.0.1-rc
+    image: actian/aggregator-processor:3.1.3
     pullPolicy: Always
   integrationManagerBase:
-    image: actian/integration-manager-base:3.0.1-rc
+    image: actian/integration-manager-base:3.1.3
     pullPolicy: Always
   jobExecution:
-    image: actian/job-execution-service:3.0.1-rc
+    image: actian/job-execution-service:3.1.3
     pullPolicy: Always
   jobResultsProcessor:
     image: actian/job-results-processor:3.0.1-rc
