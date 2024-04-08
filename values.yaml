@@ -5,7 +5,7 @@ integration-manager:
   # Credentials can be managed via
   # https://kubernetes.io/docs/concepts/configuration/secret/
   imagePullSecrets:
-    - your-secret-here
+    - actian-registrykey
   prometheus:
     operator:
       enabled: false
@@ -19,10 +19,10 @@ integration-manager:
     # Not specifying hostName to allow rules to apply to all incoming traffic through NGINX
     hostName:
   # This must be the IP & port where NGINX will be available
-  imBaseUrl: http://<ip>:<port>
+  imBaseUrl: http://localhost:80
   destinationId: 1
   datasource:
-    url: jdbc:mysql://etc/etc
+    url: jdbc:mysql://mysql:3306/db
     username: user
     password: password
   amqp:
@@ -68,10 +68,53 @@ integration-manager:
     image: actian/job-scheduler-service:3.1.3-rc
     pullPolicy: Always
   staticContent:
+    nginxConf: |
+      server {
+
+        listen      8080;
+        root        /usr/share/nginx/html;
+
+        location /apidocs {
+        try_files $uri /apidocs/index.html;
+        }
+
+        location / {
+        try_files $uri /dx/index.html;
+        }
+
+        location /ui {
+        try_files $uri /ui/index.html;
+        }    
+
+        location /dx {
+        try_files $uri /dx/index.html;
+        }
+
+        location /dx/404 {
+        try_files $uri /dx/index.html;
+        }
+
+        location /im {
+        try_files $uri /im/index.html;
+        }
+      }
     image: actian/integration-manager-static-content:3.1.3-rc
     pullPolicy: Always
+    replicaCount: 1
+    isIMOnPrem: true
+    ingress:
+      host: localhost
+    appConfig: |
+      {
+        "isCloud": false,
+      }
     aopAppConfig: |
-      something
+      {
+        "isProdEnv": false,
+        "isIMOnPrem": true,
+        "rootPath": true,
+        "isCloud": false,
+      }
 # ---- Integration Manager Worker ----
 # https://github.com/ActianCorp/integration-manager-worker-helm-chart
 integration-manager-worker:
@@ -102,7 +145,7 @@ liquibase:
   enabled: true
   imagePullSecrets:
     - actian-registrykey
-  image: actian/integration-manager-liquibase:3.1.3
+  image: actian/integration-manager-liquibase:3.1.3-rc
   pullPolicy: IfNotPresent
 
 # ---- NGINX-Ingress ----
@@ -151,7 +194,6 @@ mysql:
 #      skip-name-resolve
   primary:
     persistence:
-      # Explicitly disabled for demo purposes & ease of configurability
       enabled: true
   secondary:
     replicaCount: 0
@@ -165,7 +207,6 @@ minio:
     rootUser: AKIAIOSFODNN7EXAMPLE
     rootPassword: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   persistence:
-    # Explicitly disabled for demo purposes & ease of configurability
     enabled: true
   defaultBuckets: "repository,execution"
   resources: {}

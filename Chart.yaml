@@ -2,7 +2,7 @@
 # or log streaming are in the main templates, but must be explicitly enabled in your override-values.yaml
 apiVersion: v2
 name: integration-manager-umbrella
-version: 1.0.1
+version: 1.0.2
 appVersion: 2.0.5
 description: Installs Integration Manager, DataCloud Worker, NGINX Ingress, RabbitMQ, MySQL
 type: application
@@ -25,18 +25,18 @@ dependencies:
     version: 1.2.65
     condition: integration-manager-worker.enabled
   - name: ingress-nginx
-    version: 4.2.5
-    repository: https://charts.helm.sh/stable
+    version: 4.10.0
+    repository: https://kubernetes.github.io/ingress-nginx
     condition: ingress-nginx.enabled
   - name: rabbitmq
     version: 8.32.2
     repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
     condition: rabbitmq.enabled
   - name: mysql
-    version: 8.8.23
+    version: 10.1.1
     repository: https://charts.bitnami.com/bitnami
     condition: mysql.enabled
   - name: minio
-    version: 10.1.6
+    version: 14.1.7
     repository: https://charts.bitnami.com/bitnami
     condition: minio.enabled
