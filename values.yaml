@@ -5,7 +5,7 @@ integration-manager:
   # Credentials can be managed via
   # https://kubernetes.io/docs/concepts/configuration/secret/
   imagePullSecrets:
-    - actian-registrykey
+    - dockerhub-actian-registrykey
   prometheus:
     operator:
       enabled: false
@@ -19,7 +19,7 @@ integration-manager:
     # Not specifying hostName to allow rules to apply to all incoming traffic through NGINX
     hostName:
   # This must be the IP & port where NGINX will be available
-  imBaseUrl: http://localhost:80
+  imBaseUrl: http://localhost:8080
   destinationId: 1
   datasource:
     url: jdbc:mysql://mysql:3306/db
@@ -38,35 +38,10 @@ integration-manager:
     targetPrefix: ""
     jobTemplateDir: /product
     jobConfigDir: /provisioning
-    awsServiceEndpoint: http://integration-manager-minio:9000
-    awsSigningRegion: us-east-1
-    awsCreateEnvVar: true
-    # Fake keys used for minio
-    awsAccessKeyId: AKIAIOSFODNN7EXAMPLE
-    awsSecretAccessKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   extraConfig: |
     # path-style-access is required for minio ingress to route properly when running in k8s
     repository.aws.path-style-access-enabled=true
     logging.level.com.actian.datacloud=DEBUG
-  # These images get updated from time to time for enhancements and to fix "features".
-  aggregator:
-    image: actian/aggregator-service:3.1.3-rc
-    pullPolicy: Always
-  aggregatorProcessor:
-    image: actian/aggregator-processor:3.1.3-rc
-    pullPolicy: Always
-  integrationManagerBase:
-    image: actian/integration-manager-base:3.1.3-rc
-    pullPolicy: Always
-  jobExecution:
-    image: actian/job-execution-service:3.1.3-rc
-    pullPolicy: Always
-  jobResultsProcessor:
-    image: actian/job-results-processor:3.1.3-rc
-    pullPolicy: Always
-  jobScheduler:
-    image: actian/job-scheduler-service:3.1.3-rc
-    pullPolicy: Always
   staticContent:
     nginxConf: |
       server {
@@ -98,8 +73,6 @@ integration-manager:
         try_files $uri /im/index.html;
         }
       }
-    image: actian/integration-manager-static-content:3.1.3-rc
-    pullPolicy: Always
     replicaCount: 1
     isIMOnPrem: true
     ingress:
@@ -120,10 +93,7 @@ integration-manager:
 integration-manager-worker:
   enabled: true
   imagePullSecrets:
-    - actian-registrykey
-  image: actian/datacloud-worker:3.1.3-rc
-  dcEngineImage: actian/dataconnect-engine:12.0.0-31
-  pullPolicy: Always
+    - dockerhub-actian-registrykey
   replicaCount: 1
   resources: {}
   destinationId: 1
@@ -134,6 +104,15 @@ integration-manager-worker:
   extraConfig: |
     logging.level.org.springframework.amqp.rabbit.core=DEBUG
     logging.level.com.actian.datacloud=DEBUG
+  extraVolumes:
+    - name: "enginelog"
+      hostPath:
+        path: "/var/log/Actian/local/work/job"
+        type: ""
+    - name: "secret-volume"
+      hostPath:
+        path: "/etc/secret"
+        type: ""
   license:
   # Example:
   # license: |
@@ -144,9 +123,7 @@ integration-manager-worker:
 liquibase:
   enabled: true
   imagePullSecrets:
-    - actian-registrykey
-  image: actian/integration-manager-liquibase:3.1.3-rc
-  pullPolicy: IfNotPresent
+    - dockerhub-actian-registrykey
 
 # ---- NGINX-Ingress ----
 # https://github.com/bitnami/charts/tree/master/bitnami/nginx
