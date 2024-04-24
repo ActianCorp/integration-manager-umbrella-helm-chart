@@ -48,6 +48,10 @@ integration-manager:
     # path-style-access is required for minio ingress to route properly when running in k8s
     repository.aws.path-style-access-enabled=true
     logging.level.com.actian.datacloud=DEBUG
+    spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+    spring.datasource.url=jdbc:mysql://integration-manager-mysql:3306/dataclouddb_new?useSSL=false
+    spring.datasource.username=user
+    spring.datasource.password=password
   # These images get updated from time to time for enhancements and to fix "features".
   aggregator:
     image: actian/aggregator-service:3.1.3-527
@@ -207,6 +211,7 @@ ingress-nginx:
 # https://github.com/bitnami/charts/tree/master/bitnami/rabbitmq
 rabbitmq:
   enabled: true
+  namespaceOverride: "integration-manager"
   forceBoot: true
   prometheus:
     operator:
@@ -220,11 +225,17 @@ rabbitmq:
     # Explicitly disabled for demo purposes & ease of configurability
     enabled: true
   resources: {}
+  ingress:
+    enabled: true
 
 # ---- MySQL ----
 # https://github.com/bitnami/charts/tree/master/bitnami/mysql
 mysql:
   enabled: true
+  namespaceOverride: "integration-manager"
+  serviceBindings:
+    enabled: true
+  architecture: replication
   auth:
     username: user
     password: password
@@ -242,6 +253,8 @@ mysql:
       enabled: true
   secondary:
     replicaCount: 1
+  networkPolicy:
+    enabled: false
 
 # ---- MinIO ----
 # https://github.com/bitnami/charts/tree/master/bitnami/minio
