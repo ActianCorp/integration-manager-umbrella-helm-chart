@@ -53,10 +53,20 @@ integration-manager:
     image: actian/aggregator-service:3.1.3-527
     pullPolicy: IfNotPresent
     replicaCount: 2
+    extraConfig: |
+      spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+      spring.datasource.url=jdbc:mysql://integration-manager-mysql:3306/dataclouddb_new?useSSL=false
+      spring.datasource.username=user
+      spring.datasource.password=password
   aggregatorProcessor:
     image: actian/aggregator-processor:3.1.3-527
     pullPolicy: IfNotPresent
     replicaCount: 2
+    extraConfig: |
+      spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+      spring.datasource.url=jdbc:mysql://integration-manager-mysql:3306/dataclouddb_new?useSSL=false
+      spring.datasource.username=user
+      spring.datasource.password=password
   integrationManagerBase:
     image: actian/integration-manager-base:3.1.3-527
     pullPolicy: IfNotPresent
