@@ -203,9 +203,9 @@ rabbitmq:
       enabled: false
   replicaCount: 2
   auth:
-    erlangCookie: A90LtNydMy8Ff2nqi6kPhtj13pAUxo0h
-    username: guest
+    username: user
     password: password
+    securePassword: false
   persistence:
     # Explicitly disabled for demo purposes & ease of configurability
     enabled: true
@@ -220,6 +220,7 @@ mysql:
     password: password
     database: db
     rootPassword: password
+    createDatabase: true
 #  # MySQL Crashes if a pod with a name that's too long connects: # https://www.digitalocean.com/community/questions/mysql-crashes-when-my-pods-connects
 #  configurationFiles:
 #    mysql.cnf: |-
