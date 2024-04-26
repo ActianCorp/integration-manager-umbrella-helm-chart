@@ -52,33 +52,37 @@ integration-manager:
     spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
     spring.datasource.username=user
     spring.datasource.password=password
+    spring.mvc.pathmatch.matching-strategy=ant_path_matcher
   # These images get updated from time to time for enhancements and to fix "features".
   aggregator:
-    image: actian/aggregator-service:3.1.3-527
+    image: actian/aggregator-service:3.2.0-28.622
     pullPolicy: IfNotPresent
     replicaCount: 2
     extraConfig: |
       spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
       spring.datasource.username=user
       spring.datasource.password=password
+      spring.mvc.pathmatch.matching-strategy=ant_path_matcher
   aggregatorProcessor:
-    image: actian/aggregator-processor:3.1.3-527
+    image: actian/aggregator-processor:3.2.0-28.622
     pullPolicy: IfNotPresent
     replicaCount: 2
     extraConfig: |
       spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
       spring.datasource.username=user
       spring.datasource.password=password
+      spring.mvc.pathmatch.matching-strategy=ant_path_matcher
   integrationManagerBase:
-    image: actian/integration-manager-base:3.1.3-527
+    image: actian/integration-manager-base:3.2.0-28.622
     pullPolicy: IfNotPresent
     replicaCount: 2
     extraConfig: |
       spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
       spring.datasource.username=user
       spring.datasource.password=password
+      spring.mvc.pathmatch.matching-strategy=ant_path_matcher
   jobExecution:
-    image: actian/job-execution-service:3.1.3-527
+    image: actian/job-execution-service:3.2.0-28.622
     pullPolicy: IfNotPresent
     replicaCount: 2
     extraConfig: |
@@ -86,15 +90,16 @@ integration-manager:
       spring.datasource.username=user
       spring.datasource.password=password
   jobResultsProcessor:
-    image: actian/job-results-processor:3.1.3-527
+    image: actian/job-results-processor:3.2.0-28.622
     pullPolicy: IfNotPresent
     replicaCount: 2
     extraConfig: |
       spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
       spring.datasource.username=user
       spring.datasource.password=password
+      spring.mvc.pathmatch.matching-strategy=ant_path_matcher
   jobScheduler:
-    image: actian/job-scheduler-service:3.1.3-527
+    image: actian/job-scheduler-service:3.2.0-28.622
     pullPolicy: IfNotPresent
   staticContent:
     nginxConf: |
@@ -127,7 +132,7 @@ integration-manager:
         try_files $uri /im/index.html;
         }
       }
-    image: actian/integration-manager-static-content:3.1.3-527
+    image: actian/integration-manager-static-content:3.2.0-28.622
     pullPolicy: IfNotPresent
     replicaCount: 1
     isIMOnPrem: true
@@ -150,9 +155,11 @@ integration-manager-worker:
   enabled: true
   imagePullSecrets:
     - actian-registrykey
-  image: actian/datacloud-worker:3.1.3-527
+  image: actian/datacloud-worker:3.2.0-28.622
   dcEngineImage: actian/dataconnect-engine:12.0.0-31
   pullPolicy: IfNotPresent
+  dcOdbcImage: actian/datacloud-odbc:1.0.0-139
+  dcOdbcImagePullPolicy: IfNotPresent
   replicaCount: 3
   resources: {}
   destinationId: 1
@@ -163,6 +170,7 @@ integration-manager-worker:
   extraConfig: |
     logging.level.org.springframework.amqp.rabbit.core=DEBUG
     logging.level.com.actian.datacloud=DEBUG
+    spring.mvc.pathmatch.matching-strategy=ant_path_matcher
   license:
   # Example:
   # license: |
@@ -180,6 +188,7 @@ liquibase:
     spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
     spring.datasource.username=user
     spring.datasource.password=password
+    spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 # ---- NGINX-Ingress ----
 # https://github.com/bitnami/charts/tree/master/bitnami/nginx
