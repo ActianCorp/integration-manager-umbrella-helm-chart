@@ -219,7 +219,7 @@ mysql:
   namespaceOverride: "integration-manager"
   serviceBindings:
     enabled: true
-  architecture: replication
+  architecture: standalone
   auth:
     username: user
     password: password
