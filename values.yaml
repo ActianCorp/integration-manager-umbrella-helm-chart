@@ -22,11 +22,12 @@ integration-manager:
   imBaseUrl: http://localhost:8080
   destinationId: 1
   datasource:
-    url: jdbc:mysql://integration-manager-mysql:3306/db
+    url: jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db
     username: user
     password: password
   amqp:
-    host: integration-manager-rabbitmq
+    host: integration-manager-rabbitmq.integration-manager.svc.cluster.local
+    managementUrl: http://integration-manager-rabbitmq.integration-manager.svc.cluster.local:15672
     username: user
     password: password
   # File storage settings for in-cluster minio
@@ -38,7 +39,7 @@ integration-manager:
     targetPrefix: ""
     jobTemplateDir: /product
     jobConfigDir: /provisioning
-    awsServiceEndpoint: http://integration-manager-minio:9000
+    awsServiceEndpoint: http://integration-manager-minio.integration-manager.svc.cluster.local:9000
     awsSigningRegion: us-east-1
     awsCreateEnvVar: true
     # Fake keys used for minio
@@ -48,7 +49,7 @@ integration-manager:
     # path-style-access is required for minio ingress to route properly when running in k8s
     repository.aws.path-style-access-enabled=true
     logging.level.com.actian.datacloud=DEBUG
-    spring.datasource.url=jdbc:mysql://integration-manager-mysql:3306/db?useSSL=false
+    spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
     spring.datasource.username=user
     spring.datasource.password=password
   # These images get updated from time to time for enhancements and to fix "features".
@@ -57,7 +58,7 @@ integration-manager:
     pullPolicy: IfNotPresent
     replicaCount: 2
     extraConfig: |
-      spring.datasource.url=jdbc:mysql://integration-manager-mysql:3306/db?useSSL=false
+      spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
       spring.datasource.username=user
       spring.datasource.password=password
   aggregatorProcessor:
@@ -65,7 +66,7 @@ integration-manager:
     pullPolicy: IfNotPresent
     replicaCount: 2
     extraConfig: |
-      spring.datasource.url=jdbc:mysql://integration-manager-mysql:3306/db?useSSL=false
+      spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
       spring.datasource.username=user
       spring.datasource.password=password
   integrationManagerBase:
@@ -73,7 +74,7 @@ integration-manager:
     pullPolicy: IfNotPresent
     replicaCount: 2
     extraConfig: |
-      spring.datasource.url=jdbc:mysql://integration-manager-mysql:3306/db?useSSL=false
+      spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
       spring.datasource.username=user
       spring.datasource.password=password
   jobExecution:
@@ -81,7 +82,7 @@ integration-manager:
     pullPolicy: IfNotPresent
     replicaCount: 2
     extraConfig: |
-      spring.datasource.url=jdbc:mysql://integration-manager-mysql:3306/db?useSSL=false
+      spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
       spring.datasource.username=user
       spring.datasource.password=password
   jobResultsProcessor:
@@ -89,7 +90,7 @@ integration-manager:
     pullPolicy: IfNotPresent
     replicaCount: 2
     extraConfig: |
-      spring.datasource.url=jdbc:mysql://integration-manager-mysql:3306/db?useSSL=false
+      spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
       spring.datasource.username=user
       spring.datasource.password=password
   jobScheduler:
@@ -156,7 +157,7 @@ integration-manager-worker:
   resources: {}
   destinationId: 1
   amqp:
-    host: integration-manager-rabbitmq
+    host: integration-manager-rabbitmq.integration-manager.svc.cluster.local
     username: guest
     password: password
   extraConfig: |
@@ -176,7 +177,7 @@ liquibase:
   image: actian/integration-manager-liquibase:3.1.3-527
   pullPolicy: IfNotPresent
   extraConfig: |
-    spring.datasource.url=jdbc:mysql://integration-manager-mysql:3306/db?useSSL=false
+    spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
     spring.datasource.username=user
     spring.datasource.password=password
 
