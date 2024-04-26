@@ -168,15 +168,6 @@ integration-manager-worker:
   extraConfig: |
     logging.level.org.springframework.amqp.rabbit.core=DEBUG
     logging.level.com.actian.datacloud=DEBUG
-  extraVolumes:
-    - name: "enginelog"
-      hostPath:
-        path: "/var/log/Actian/local/work/job"
-        type: ""
-    - name: "secret-volume"
-      hostPath:
-        path: "/etc/secret"
-        type: ""
   license:
   # Example:
   # license: |
