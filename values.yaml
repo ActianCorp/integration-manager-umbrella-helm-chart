@@ -232,11 +232,6 @@ mysql:
 #      [mysqld]
 #      skip-host-cache
 #      skip-name-resolve
-  primary:
-    persistence:
-      enabled: true
-  secondary:
-    replicaCount: 1
   networkPolicy:
     enabled: false
 
