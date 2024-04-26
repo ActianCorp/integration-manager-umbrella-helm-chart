@@ -174,7 +174,7 @@ liquibase:
   enabled: true
   imagePullSecrets:
     - actian-registrykey
-  image: actian/integration-manager-liquibase:3.1.3-527
+  image: actian/integration-manager-liquibase:3.2.0-28.622
   pullPolicy: IfNotPresent
   extraConfig: |
     spring.datasource.url=jdbc:mysql://integration-manager-mysql.integration-manager.svc.cluster.local:3306/db?useSSL=false
