@@ -2,7 +2,7 @@
 # or log streaming are in the main templates, but must be explicitly enabled in your override-values.yaml
 apiVersion: v2
 name: integration-manager-umbrella
-version: 1.0.2
+version: 1.0.3
 appVersion: 2.0.5
 description: Installs Integration Manager, DataCloud Worker, NGINX Ingress, RabbitMQ, MySQL
 type: application
