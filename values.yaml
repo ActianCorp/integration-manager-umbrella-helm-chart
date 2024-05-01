@@ -240,3 +240,15 @@ minio:
     enabled: true
   defaultBuckets: "repository,execution"
   resources: {}
+
+# ---- Longhorn - File Management System ----
+longhorn:
+  enabled: true
+  helmPreUpgradeCheckerJob:
+    enabled: false
+  longhornUI:
+    replicas: 1
+  # Disable ingress - setting up authentication takes more, will need to kubectl port-forward to access UI
+  ingress:
+    enabled: false
+  
