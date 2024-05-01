@@ -30,21 +30,7 @@ integration-manager:
     managementUrl: http://integration-manager-rabbitmq.integration-manager.svc.cluster.local:15672
     username: user
     password: password
-  # File storage settings for in-cluster minio
-  repository:
-    storageType: aws
-    sourceBucket: repository
-    sourcePrefix: datacloud
-    targetBucket: execution
-    targetPrefix: ""
-    jobTemplateDir: /product
-    jobConfigDir: /provisioning
-    awsServiceEndpoint: http://integration-manager-minio.integration-manager.svc.cluster.local:9000
-    awsSigningRegion: us-east-1
-    awsCreateEnvVar: true
-    # Fake keys used for minio
-    awsAccessKeyId: AKIAIOSFODNN7EXAMPLE
-    awsSecretAccessKey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    sslEnabled: false
   extraConfig: |
     # path-style-access is required for minio ingress to route properly when running in k8s
     repository.aws.path-style-access-enabled=true
@@ -165,16 +151,14 @@ integration-manager-worker:
   destinationId: 1
   amqp:
     host: integration-manager-rabbitmq.integration-manager.svc.cluster.local
-    username: guest
+    username: user
     password: password
   extraConfig: |
     logging.level.org.springframework.amqp.rabbit.core=DEBUG
     logging.level.com.actian.datacloud=DEBUG
     spring.mvc.pathmatch.matching-strategy=ant_path_matcher
-  license:
-  # Example:
+  # will need to put license here
   # license: |
-  #   <my-license-contents>
 
 # ---- Liquibase ----
 # This runs a docker image that contains liquibase scripts to bootstrap the database
@@ -210,15 +194,15 @@ rabbitmq:
     operator:
       enabled: false
   clustering:
-    enabled: true
-  replicaCount: 2
+    enabled: false
+  replicaCount: 1
   auth:
     username: user
     password: password
     securePassword: false
+    tls:
+      enabled: false
   resources: {}
-  ingress:
-    enabled: true
 
 # ---- MySQL ----
 # https://github.com/bitnami/charts/tree/master/bitnami/mysql
@@ -234,19 +218,20 @@ mysql:
     database: db
     rootPassword: password
     createDatabase: true
-#  # MySQL Crashes if a pod with a name that's too long connects: # https://www.digitalocean.com/community/questions/mysql-crashes-when-my-pods-connects
-#  configurationFiles:
-#    mysql.cnf: |-
-#      [mysqld]
-#      skip-host-cache
-#      skip-name-resolve
+  #  # MySQL Crashes if a pod with a name that's too long connects: # https://www.digitalocean.com/community/questions/mysql-crashes-when-my-pods-connects
+  #  configurationFiles:
+  #    mysql.cnf: |-
+  #      [mysqld]
+  #      skip-host-cache
+  #      skip-name-resolve
   networkPolicy:
     enabled: false
 
 # ---- MinIO ----
 # https://github.com/bitnami/charts/tree/master/bitnami/minio
 minio:
-  enabled: true
+  # Disabled since Longhorn seems to work better for me
+  enabled: false
   mode: standalone
   auth:
     rootUser: AKIAIOSFODNN7EXAMPLE
