@@ -14,16 +14,15 @@ keywords:
   - MySQL
 
 dependencies:
-  - name: integration-manager
-    repository: https://s3.amazonaws.com/actian-datacloud-helm-charts
-    version: 1.2.86
-    condition: integration-manager.enabled
-  # Template information for the integration-manager-worker chart can be found here
-  # https://github.com/ActianCorp/integration-manager-worker-helm-chart/tree/master
-  - name: integration-manager-worker
-    repository: https://s3.amazonaws.com/actian-datacloud-helm-charts
-    version: 1.2.63
-    condition: integration-manager-worker.enabled
+  # Both longhorn and minio are used for storage, longhorn seems to be more robust
+  - name: longhorn
+    version: "1.5.5"
+    repository: "https://charts.longhorn.io"
+    condition: longhorn.enabled
+  - name: minio
+    version: 14.1.7
+    repository: https://charts.bitnami.com/bitnami
+    condition: minio.enabled
   - name: ingress-nginx
     version: 4.10.0
     repository: https://kubernetes.github.io/ingress-nginx
@@ -36,7 +35,13 @@ dependencies:
     version: 10.1.1
     repository: https://charts.bitnami.com/bitnami
     condition: mysql.enabled
-  - name: minio
-    version: 14.1.7
-    repository: https://charts.bitnami.com/bitnami
-    condition: minio.enabled
+  - name: integration-manager
+    repository: https://s3.amazonaws.com/actian-datacloud-helm-charts
+    version: 1.2.86
+    condition: integration-manager.enabled
+  # Template information for the integration-manager-worker chart can be found here
+  # https://github.com/ActianCorp/integration-manager-worker-helm-chart/tree/master
+  - name: integration-manager-worker
+    repository: https://s3.amazonaws.com/actian-datacloud-helm-charts
+    version: 1.2.63
+    condition: integration-manager-worker.enabled
